@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using NSubstitute;
 using NUnit.Framework;
@@ -43,7 +44,7 @@ namespace RestaurantKata
     public class CookTests
     {
         [Test]
-        public void Monkey()
+        public void GivenAnOrder_TheNextStepShouldBeCalled()
         {
             var nextStep = Substitute.For<IOrderConsumer>();
             var cook = new Cook(nextStep);
@@ -52,6 +53,18 @@ namespace RestaurantKata
             cook.Consume(order);
 
             nextStep.Received(1).Consume(order);
+        }
+
+        [Test]
+        public void GivenAnOrder_TheOrderShouldBeEnrichedWithIngredients()
+        {
+            var nextStep = Substitute.For<IOrderConsumer>();
+            var cook = new Cook(nextStep);
+            var order = Given.AnOrderForJapanese();
+            
+            cook.Consume(order);
+
+            Assert.That(order.Items.All(x => x.Ingredients.Any()));
         }
     }
 }
