@@ -20,13 +20,7 @@ namespace RestaurantKata
 
     public class Item
     {
-        public Item()
-        {
-            Ingredients = new List<string>();
-        }
-
         public Item(string itemDescription, decimal quantity)
-            : this()
         {
             ItemDescription = itemDescription;
             Quantity = quantity;
@@ -35,7 +29,7 @@ namespace RestaurantKata
         public string ItemDescription { get; set; }
         public decimal Quantity { get; set; }
         public decimal Price { get; set; }
-        public List<string> Ingredients { get; protected set; }
+        public string[] Ingredients { get; set; }
     }
 
     public class WaitressOrder

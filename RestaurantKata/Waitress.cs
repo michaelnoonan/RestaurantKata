@@ -6,10 +6,10 @@ namespace RestaurantKata
 {
     public class Waitress
     {
-        private readonly IProcessOrder _nextStep;
+        private readonly IOrderConsumer _nextStep;
         public string Name { get; protected set; }
 
-        public Waitress(string name, IProcessOrder nextStep)
+        public Waitress(string name, IOrderConsumer nextStep)
         {
             _nextStep = nextStep;
             Name = name;
@@ -25,7 +25,7 @@ namespace RestaurantKata
                                 Items = items
                             };
 
-            _nextStep.Process(order);
+            _nextStep.Consume(order);
         }
     }
 
@@ -35,7 +35,7 @@ namespace RestaurantKata
         [Test]
         public void TheWaitressCanTakeAnOrder()
         {
-            var nextStep = Substitute.For<IProcessOrder>(); 
+            var nextStep = Substitute.For<IOrderConsumer>(); 
             var waitress = new Waitress("Sexy Mary", nextStep);
             
             waitress.PlaceOrder(15, "dodgy", new[]
@@ -45,7 +45,7 @@ namespace RestaurantKata
                                                      new Item("Sake", 2),
                                                  });
 
-            nextStep.Received(1).Process(Arg.Any<Order>());
+            nextStep.Received(1).Consume(Arg.Any<Order>());
         }
     }
 }

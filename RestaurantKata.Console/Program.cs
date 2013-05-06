@@ -11,7 +11,7 @@ namespace RestaurantKata
     {
         static void Main(string[] args)
         {
-            var waitress = new Waitress("Sexy Mary", new ConsoleOrderProcessor());
+            var waitress = new Waitress("Sexy Mary", new ConsoleOrderConsumerProcessor());
 
             waitress.PlaceOrder(15, "dodgy", new[]
                                                  {
@@ -25,9 +25,9 @@ namespace RestaurantKata
         }
     }
 
-    public class ConsoleOrderProcessor : IProcessOrder
+    public class ConsoleOrderConsumerProcessor : IOrderConsumer
     {
-        public void Process(Order order)
+        public void Consume(Order order)
         {
             Console.WriteLine(JsonConvert.SerializeObject(order, Formatting.Indented));
         }
