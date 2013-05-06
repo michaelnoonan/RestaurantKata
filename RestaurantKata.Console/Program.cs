@@ -11,7 +11,9 @@ namespace RestaurantKata
     {
         static void Main(string[] args)
         {
-            var waitress = new Waitress("Sexy Mary", new ConsoleOrderConsumerProcessor());
+            var assistantManager = new AssistantManager(new ConsoleOrderConsumerProcessor());
+            var cook = new Cook(assistantManager);
+            var waitress = new Waitress("Sexy Mary", cook);
 
             waitress.PlaceOrder(15, "dodgy", new[]
                                                  {
@@ -21,7 +23,6 @@ namespace RestaurantKata
                                                  });
 
             Console.ReadLine();
-
         }
     }
 
