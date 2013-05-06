@@ -15,7 +15,7 @@ namespace RestaurantKata
         public decimal Total { get; set; }
         public int Cooktime { get; set; }
         public string Id { get; set; }
-        public List<Item> Items { get; set; }
+        public Item[] Items { get; set; }
     }
 
     public class Item
@@ -23,6 +23,13 @@ namespace RestaurantKata
         public Item()
         {
             Ingredients = new List<string>();
+        }
+
+        public Item(string itemDescription, decimal quantity)
+            : this()
+        {
+            ItemDescription = itemDescription;
+            Quantity = quantity;
         }
 
         public string ItemDescription { get; set; }
