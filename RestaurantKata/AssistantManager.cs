@@ -2,6 +2,7 @@
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
+using RestaurantKata.Infrastructure;
 
 namespace RestaurantKata
 {

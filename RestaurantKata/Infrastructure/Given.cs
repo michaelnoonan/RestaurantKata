@@ -1,4 +1,4 @@
-﻿namespace RestaurantKata
+﻿namespace RestaurantKata.Infrastructure
 {
     public class Given
     {

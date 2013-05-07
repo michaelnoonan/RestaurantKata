@@ -35,7 +35,7 @@ namespace RestaurantKata.Infrastructure
                          {
                              foreach (var component in components)
                              {
-                                 Console.WriteLine("Queue {0} Count: {1}", component.QueneName, component.CountOfItemsInQueue);
+                                 Console.WriteLine("Queue {0} Count: {1}", component.Name, component.CountOfItemsInQueue);
                              }
                              Thread.Sleep(1000);
                          }

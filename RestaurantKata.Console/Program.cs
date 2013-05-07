@@ -25,9 +25,7 @@ namespace RestaurantKata
             TopicPubSub.Instance.Subscribe("FoodPrepared", assistantManager);
             TopicPubSub.Instance.Subscribe("OrderTotalled", threadedCashier);
 
-            StartAllStartables();
-
-            StartQueueMonitoring();
+            Start();
 
             const int numberOfOrders = 200;
             var startTimes = new Dictionary<string, DateTime>();
@@ -40,26 +38,28 @@ namespace RestaurantKata
 
             Console.WriteLine(summary.ToString());
             Console.WriteLine("Press enter to finish...");
+
             Console.ReadLine();
         }
 
         private static ThreadedConsumer<IOrderConsumer> PrepareThreadedCashier(Cashier cashier)
         {
-            var threadedCashier = new ThreadedConsumer<IOrderConsumer>(cashier);
+            var threadedCashier = new ThreadedConsumer<IOrderConsumer>("Cashier", cashier);
             ThreadedConsumers.Add(threadedCashier);
             return threadedCashier;
         }
 
         private static ThreadedConsumer<IOrderConsumer> PrepareAssistantManager()
         {
-            var assistantManager =
-                new ThreadedConsumer<IOrderConsumer>(new AssistantManager(new PublishingConsumer("OrderTotalled")));
+            var assistantManager = new ThreadedConsumer<IOrderConsumer>("AssistantManager", new AssistantManager(new PublishingConsumer("OrderTotalled")));
             ThreadedConsumers.Add(assistantManager);
             return assistantManager;
         }
 
-        private static void StartAllStartables()
+        private static void Start()
         {
+            StartQueueMonitoring();
+
             foreach (var startable in ThreadedConsumers)
             {
                 startable.Start();
@@ -72,12 +72,12 @@ namespace RestaurantKata
             const int numberOfCooks = 3;
             for (var i = 0; i < numberOfCooks; i++)
             {
-                var threadedCook = new ThreadedConsumer<IOrderConsumer>(new TimeToLiveHandler(new Cook(new PublishingConsumer("FoodPrepared"))));
+                var threadedCook = new ThreadedConsumer<IOrderConsumer>("Cook", new TimeToLiveHandler(new Cook(new PublishingConsumer("FoodPrepared"))));
                 threadedCooks.Add(threadedCook);
                 ThreadedConsumers.Add(threadedCook);
             }
 
-            var dispatcher = new ThreadedConsumer<IOrderConsumer>(new OrderDispatcher(threadedCooks), int.MaxValue);
+            var dispatcher = new ThreadedConsumer<IOrderConsumer>("Dispatcher", new OrderDispatcher(threadedCooks), int.MaxValue);
             ThreadedConsumers.Add(dispatcher);
             return dispatcher;
         }
@@ -115,6 +115,8 @@ namespace RestaurantKata
             {
                 var orderId = PlaceNewOrder(waitress, i);
                 startTimes.Add(orderId, DateTime.Now);
+
+                Thread.Sleep(100);
             }
         }
 

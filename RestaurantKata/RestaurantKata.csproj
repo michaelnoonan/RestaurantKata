@@ -65,7 +65,7 @@
     <Compile Include="Infrastructure\TopicPubSub.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Cook.cs" />
-    <Compile Include="Given.cs" />
+    <Compile Include="Infrastructure\Given.cs" />
     <Compile Include="IOrderConsumer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\TimeToLiveHandler.cs" />
