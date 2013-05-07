@@ -52,5 +52,10 @@ namespace RestaurantKata
                 throw new Exception("Ahhhhh, this should never happen?");
             }
         }
+
+        public bool IsBillReadyToPay(int tableNumber)
+        {
+            return _unpaidOrders.ContainsKey(tableNumber);
+        }
     }
 }

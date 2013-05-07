@@ -19,10 +19,12 @@ namespace RestaurantKata
             threadedCook1.Start();
             threadedCook2.Start();
             threadedCook3.Start();
-            var roundRobinCook = new RoundRobinConsumer(
-                threadedCook1,
-                threadedCook2,
-                threadedCook3);
+            var roundRobinCook = new ThreadedConsumer<RoundRobinConsumer>(
+                new RoundRobinConsumer(
+                    threadedCook1,
+                    threadedCook2,
+                    threadedCook3));
+            roundRobinCook.Start();
             var waitress = new Waitress("Sexy Mary", roundRobinCook);
 
             threadedCashier.Start();
@@ -42,8 +44,14 @@ namespace RestaurantKata
 
             for (int i = 0; i < numberOfOrders; i++)
             {
-                threadedCashier.Consumer.PayBill(i, 100M);
-                Console.WriteLine("Paid bill for table: " + i);
+                while (!threadedCashier.Consumer.IsBillReadyToPay(i))
+                {
+                    Thread.Sleep(100);
+                }
+                {
+                    threadedCashier.Consumer.PayBill(i, 100M);
+                    Console.WriteLine("Paid bill for table: " + i);
+                }
             }
 
             Console.WriteLine("Press enter to finish...");
