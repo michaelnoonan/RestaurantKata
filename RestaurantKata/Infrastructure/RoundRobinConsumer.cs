@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RestaurantKata.Infrastructure
 {
     public class RoundRobinConsumer : IOrderConsumer
     {
         private readonly ConcurrentQueue<IOrderConsumer> _consumers;
-        public RoundRobinConsumer(params IOrderConsumer[] consumers)
+        public RoundRobinConsumer(IEnumerable<IOrderConsumer> consumers)
         {
             _consumers = new ConcurrentQueue<IOrderConsumer>(consumers);
         }

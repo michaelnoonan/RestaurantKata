@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
@@ -13,20 +14,18 @@ namespace RestaurantKata
         {
             var threadedCashier = new ThreadedConsumer<Cashier>(new Cashier(new ConsoleOrderConsumerProcessor()));
             var threadedAssistantManager = new ThreadedConsumer<AssistantManager>(new AssistantManager(threadedCashier));
-            var threadedCook1 = new ThreadedConsumer<Cook>(new Cook(threadedAssistantManager));
-            var threadedCook2 = new ThreadedConsumer<Cook>(new Cook(threadedAssistantManager));
-            var threadedCook3 = new ThreadedConsumer<Cook>(new Cook(threadedAssistantManager));
-            threadedCook1.Start();
-            threadedCook2.Start();
-            threadedCook3.Start();
-            var roundRobinCook = new ThreadedConsumer<RoundRobinConsumer>(
-                new RoundRobinConsumer(
-                    threadedCook1,
-                    threadedCook2,
-                    threadedCook3));
-            roundRobinCook.Start();
+            var threadedCooks = new List<IOrderConsumer>();
+            const int numberOfCooks = 6;
+            for (int i = 0; i < numberOfCooks; i++)
+            {
+                threadedCooks.Add(new ThreadedConsumer<Cook>(new Cook(threadedAssistantManager)));
+            }
+                
+            var roundRobinCook = new ThreadedConsumer<RoundRobinConsumer>(new RoundRobinConsumer(threadedCooks));
             var waitress = new Waitress("Sexy Mary", roundRobinCook);
-
+            
+            roundRobinCook.Start();
+            foreach (var cook in threadedCooks.OfType<IStartable>()) cook.Start();
             threadedCashier.Start();
             threadedAssistantManager.Start();
             const int numberOfOrders = 200;
