@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -12,11 +8,12 @@ namespace RestaurantKata
     {
         static void Main(string[] args)
         {
-            var assistantManager = new AssistantManager(new ConsoleOrderConsumerProcessor());
+            var cashier = new Cashier(new ConsoleOrderConsumerProcessor());
+            var assistantManager = new AssistantManager(cashier);
             var cook = new Cook(assistantManager);
             var waitress = new Waitress("Sexy Mary", cook);
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 2; i++)
             {
                 waitress.PlaceOrder(i, i % 2 == 0 ? "good looking" : "dodgy", new[]
                                                      {
@@ -24,6 +21,7 @@ namespace RestaurantKata
                                                          new Item("Clean glass", 2),
                                                          new Item("Sake", 2),
                                                      });
+                cashier.PayBill(i, 100M);
             }
 
             Console.ReadLine();

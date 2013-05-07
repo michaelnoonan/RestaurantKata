@@ -15,6 +15,7 @@ namespace RestaurantKata
         public int Cooktime { get; set; }
         public string Id { get; set; }
         public Item[] Items { get; set; }
+        public bool Paid { get; set; }
     }
 
     public class Item
