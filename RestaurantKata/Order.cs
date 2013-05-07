@@ -90,7 +90,7 @@ namespace RestaurantKata
             var serializedWaitressOrder = JsonConvert.SerializeObject(order);
 
             dynamic deserializedWaitressOrder = JObject.Parse(serializedWaitressOrder);
-            Assert.That(deserializedWaitressOrder.TableNumber, Is.EqualTo("15"));
+            Assert.That(deserializedWaitressOrder.TableNumber.ToString(), Is.EqualTo("15"));
 
             var cook = new CookOrder(deserializedWaitressOrder);
             cook.TableNumber = "999";
