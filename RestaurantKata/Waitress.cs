@@ -6,26 +6,29 @@ namespace RestaurantKata
 {
     public class Waitress
     {
-        private readonly IOrderConsumer _nextStep;
+        private readonly IOrderConsumer nextStep;
         public string Name { get; protected set; }
 
         public Waitress(string name, IOrderConsumer nextStep)
         {
-            _nextStep = nextStep;
+            this.nextStep = nextStep;
             Name = name;
         }
 
-        public void PlaceOrder(int tableNumber, string customerCategory, Item[] items)
+        public string PlaceOrder(int tableNumber, string customerCategory, Item[] items)
         {
             var order = new Order
                             {
+                                Id = Guid.NewGuid().ToString(),
                                 Server = Name,
                                 TableNumber = tableNumber,
                                 CustomerCategory = customerCategory,
                                 Items = items
                             };
 
-            _nextStep.Consume(order);
+            nextStep.Consume(order);
+
+            return order.Id;
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -9,7 +10,7 @@ namespace RestaurantKata
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             var threadedCashier = new ThreadedConsumer<Cashier>(new Cashier(new ConsoleOrderConsumerProcessor()));
             var threadedAssistantManager = new ThreadedConsumer<AssistantManager>(new AssistantManager(threadedCashier));
@@ -29,31 +30,37 @@ namespace RestaurantKata
 
             threadedCashier.Start();
             threadedAssistantManager.Start();
-            const int numberOfOrders = 200;
-            for (int i = 0; i < numberOfOrders; i++)
+            const int numberOfOrders = 20;
+            var startTimes = new Dictionary<string, DateTime>();
+            
+            for (var i = 0; i < numberOfOrders; i++)
             {
-                waitress.PlaceOrder(i, i % 2 == 0 ? "good looking" : "dodgy", new[]
+                var id = waitress.PlaceOrder(i, i % 2 == 0 ? "good looking" : "dodgy", new[]
                                                      {
                                                          new Item("Sushi", 2),
                                                          new Item("Clean glass", 2),
                                                          new Item("Sake", 2),
                                                      });
+                startTimes.Add(id, DateTime.Now);
             }
 
-            Thread.Sleep(10000);
-
-            for (int i = 0; i < numberOfOrders; i++)
+            var ordersPaid = 0;
+            var buffer = new StringBuilder();
+            do
             {
-                while (!threadedCashier.Consumer.IsBillReadyToPay(i))
+                var ordersToPay = threadedCashier.Consumer.GetOrdersReadyToPay();
+                foreach (var order in ordersToPay)
                 {
-                    Thread.Sleep(100);
+                    threadedCashier.Consumer.PayBill(order);
+                    var startTime = startTimes[order.Id];
+                    buffer.AppendFormat("Order paid. Time: {0} Id {1} {2}", (DateTime.Now - startTime) ,  order.Id, Environment.NewLine);
+                    ordersPaid++;
                 }
-                {
-                    threadedCashier.Consumer.PayBill(i, 100M);
-                    Console.WriteLine("Paid bill for table: " + i);
-                }
-            }
 
+            } while (ordersPaid < numberOfOrders);
+
+            Thread.Sleep(1000);
+            Console.WriteLine(buffer.ToString());
             Console.WriteLine("Press enter to finish...");
             Console.ReadLine();
         }
@@ -69,7 +76,7 @@ namespace RestaurantKata
                                    ContractResolver = new CamelCasePropertyNamesContractResolver()
                                };
             
-            Console.WriteLine(JsonConvert.SerializeObject(order, settings));
+           Console.WriteLine(JsonConvert.SerializeObject(order, settings));
         }
     }
 
