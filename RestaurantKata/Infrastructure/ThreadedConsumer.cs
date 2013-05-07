@@ -13,7 +13,8 @@ namespace RestaurantKata.Infrastructure
             get { return consumer.GetType().Name; }
         }
 
-        public int CountOfItemsInQueue {
+        public int CountOfItemsInQueue 
+        {
             get
             {
                 return ordersToProcess.Count;

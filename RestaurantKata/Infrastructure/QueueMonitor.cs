@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using RestaurantKata.Infrastructure;
 
-namespace RestaurantKata
+namespace RestaurantKata.Infrastructure
 {
-    internal class QueueMonitor
+    public class QueueMonitor
     {
         private readonly IList<ThreadedConsumer<IOrderConsumer>> components;
 
