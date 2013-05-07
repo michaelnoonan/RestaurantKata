@@ -25,7 +25,8 @@ namespace RestaurantKata
         {
             Name = Guid.NewGuid().ToString();
             this.nextStep = nextStep;
-            cookingDelay = Random.Next(100, 2000);
+            cookingDelay = new Random().Next(100, 2000);
+            Console.WriteLine("Cooking delay {0}: {1}", Name, cookingDelay);
         }
 
         public string Name { get; set; }
