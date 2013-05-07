@@ -44,6 +44,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,6 +54,7 @@
   <ItemGroup>
     <Compile Include="AssistantManager.cs" />
     <Compile Include="Cashier.cs" />
+    <Compile Include="Infrastructure\ExtensibleDynamicObject.cs" />
     <Compile Include="Infrastructure\IStartable.cs" />
     <Compile Include="Infrastructure\ThreadedConsumer.cs" />
     <Compile Include="Order.cs" />
