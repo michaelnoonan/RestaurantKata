@@ -31,7 +31,6 @@ namespace RestaurantKata
 
         private void PriceOrder(Order order)
         {
-            Thread.Sleep(500);
             foreach (var item in order.Items)
             {
                 item.Price = priceList[item.ItemDescription];
