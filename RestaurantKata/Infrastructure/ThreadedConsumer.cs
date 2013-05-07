@@ -8,9 +8,9 @@ namespace RestaurantKata.Infrastructure
     public class ThreadedConsumer<T> : IOrderConsumer, IStartable where T : IOrderConsumer
     {
         public T Consumer { get { return consumer; } }
-        public string QueneName 
+        public string Name 
         {
-            get { return consumer.GetType().Name; }
+            get { return name; }
         }
 
         public int CountOfItemsInQueue 
@@ -21,12 +21,14 @@ namespace RestaurantKata.Infrastructure
             }
         }
 
+        private readonly string name;
         private readonly T consumer;
         private readonly int queueLimit;
         private readonly ConcurrentQueue<Order> ordersToProcess = new ConcurrentQueue<Order>();
 
-        public ThreadedConsumer(T consumer, int queueLimit = 10)
+        public ThreadedConsumer(string name, T consumer, int queueLimit = 10)
         {
+            this.name = name;
             this.consumer = consumer;
             this.queueLimit = queueLimit;
         }
