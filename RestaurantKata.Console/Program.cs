@@ -9,7 +9,7 @@ namespace RestaurantKata
     class Program
     {
         static void Main()
-        {
+        {                      
             var cashier = new Cashier(new ConsoleOrderConsumerProcessor());
             var threadedCashier = new ThreadedConsumer<IOrderConsumer>(cashier);
             var threadedAssistantManager = new ThreadedConsumer<IOrderConsumer>(new AssistantManager(threadedCashier));
