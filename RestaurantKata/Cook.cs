@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NSubstitute;
@@ -20,12 +21,16 @@ namespace RestaurantKata
 
         public Cook(IOrderConsumer nextStep)
         {
+            Name = Guid.NewGuid().ToString();
             _nextStep = nextStep;
         }
+
+        public string Name { get; set; }
 
         private void PrepareFood(Order order)
         {
             Thread.Sleep(500);
+            Console.WriteLine("Food prepared by: " + Name);
             order.CookTime = 500;
             foreach (var item in order.Items)
             {

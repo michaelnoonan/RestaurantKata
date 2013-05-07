@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -8,7 +7,7 @@ namespace RestaurantKata
 {
     public class AssistantManager : IOrderConsumer
     {
-        private readonly IDictionary<string, decimal> priceList =
+        private readonly IDictionary<string, decimal> _priceList =
             new Dictionary<string, decimal>
                 {
                     { "Sake", 15M },
@@ -33,7 +32,7 @@ namespace RestaurantKata
         {
             foreach (var item in order.Items)
             {
-                item.Price = priceList[item.ItemDescription];
+                item.Price = _priceList[item.ItemDescription];
             }
         }
     }

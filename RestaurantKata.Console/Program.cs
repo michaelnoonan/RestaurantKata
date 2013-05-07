@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -12,14 +13,22 @@ namespace RestaurantKata
         {
             var threadedCashier = new ThreadedConsumer<Cashier>(new Cashier(new ConsoleOrderConsumerProcessor()));
             var threadedAssistantManager = new ThreadedConsumer<AssistantManager>(new AssistantManager(threadedCashier));
-            var threadedCook = new ThreadedConsumer<Cook>(new Cook(threadedAssistantManager));
-            var waitress = new Waitress("Sexy Mary", threadedCook);
+            var threadedCook1 = new ThreadedConsumer<Cook>(new Cook(threadedAssistantManager));
+            var threadedCook2 = new ThreadedConsumer<Cook>(new Cook(threadedAssistantManager));
+            var threadedCook3 = new ThreadedConsumer<Cook>(new Cook(threadedAssistantManager));
+            threadedCook1.Start();
+            threadedCook2.Start();
+            threadedCook3.Start();
+            var roundRobinCook = new RoundRobinConsumer(
+                threadedCook1,
+                threadedCook2,
+                threadedCook3);
+            var waitress = new Waitress("Sexy Mary", roundRobinCook);
 
             threadedCashier.Start();
             threadedAssistantManager.Start();
-            threadedCook.Start();
-
-            for (int i = 0; i < 2; i++)
+            const int numberOfOrders = 200;
+            for (int i = 0; i < numberOfOrders; i++)
             {
                 waitress.PlaceOrder(i, i % 2 == 0 ? "good looking" : "dodgy", new[]
                                                      {
@@ -29,9 +38,9 @@ namespace RestaurantKata
                                                      });
             }
 
-            Thread.Sleep(5000);
+            Thread.Sleep(10000);
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < numberOfOrders; i++)
             {
                 threadedCashier.Consumer.PayBill(i, 100M);
                 Console.WriteLine("Paid bill for table: " + i);

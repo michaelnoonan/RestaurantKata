@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 
 namespace RestaurantKata
@@ -6,6 +7,7 @@ namespace RestaurantKata
     {
         private readonly IOrderConsumer _nextStep;
         private readonly ConcurrentDictionary<int, Order> _unpaidOrders = new ConcurrentDictionary<int, Order>();
+        private readonly ConcurrentDictionary<int, Order> _paidOrders = new ConcurrentDictionary<int, Order>();
 
         public Cashier(IOrderConsumer nextStep)
         {
@@ -36,8 +38,19 @@ namespace RestaurantKata
 
         public void PayBill(int tableNumber, decimal amountPaid)
         {
-            var order = _unpaidOrders[tableNumber];
-            if (order.Total <= amountPaid) order.Paid = true;
+            Order order;
+            if (_unpaidOrders.TryRemove(tableNumber, out order))
+            {
+                if (amountPaid >= order.Total)
+                {
+                    order.Paid = true;
+                    _paidOrders[tableNumber] = order;
+                }
+            }
+            else
+            {
+                throw new Exception("Ahhhhh, this should never happen?");
+            }
         }
     }
 }
