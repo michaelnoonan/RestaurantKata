@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace RestaurantKata
 {
@@ -15,12 +16,15 @@ namespace RestaurantKata
             var cook = new Cook(assistantManager);
             var waitress = new Waitress("Sexy Mary", cook);
 
-            waitress.PlaceOrder(15, "dodgy", new[]
-                                                 {
-                                                     new Item("Sushi", 2),
-                                                     new Item("Clean glass", 2),
-                                                     new Item("Sake", 2),
-                                                 });
+            for (int i = 0; i < 100; i++)
+            {
+                waitress.PlaceOrder(i, i % 2 == 0 ? "good looking" : "dodgy", new[]
+                                                     {
+                                                         new Item("Sushi", 2),
+                                                         new Item("Clean glass", 2),
+                                                         new Item("Sake", 2),
+                                                     });
+            }
 
             Console.ReadLine();
         }
@@ -30,7 +34,13 @@ namespace RestaurantKata
     {
         public void Consume(Order order)
         {
-            Console.WriteLine(JsonConvert.SerializeObject(order, Formatting.Indented));
+            var settings = new JsonSerializerSettings
+                               {
+                                   Formatting = Formatting.Indented,
+                                   ContractResolver = new CamelCasePropertyNamesContractResolver()
+                               };
+            
+            Console.WriteLine(JsonConvert.SerializeObject(order, settings));
         }
     }
 
