@@ -10,14 +10,14 @@ namespace RestaurantKata
     {
         static void Main(string[] args)
         {
-            var cashier = new ThreadedConsumer<Cashier>(new Cashier(new ConsoleOrderConsumerProcessor()));
-            var assistantManager = new ThreadedConsumer<AssistantManager>(new AssistantManager(cashier));
-            var cook = new ThreadedConsumer<Cook>(new Cook(assistantManager));
-            var waitress = new Waitress("Sexy Mary", cook);
+            var threadedCashier = new ThreadedConsumer<Cashier>(new Cashier(new ConsoleOrderConsumerProcessor()));
+            var threadedAssistantManager = new ThreadedConsumer<AssistantManager>(new AssistantManager(threadedCashier));
+            var threadedCook = new ThreadedConsumer<Cook>(new Cook(threadedAssistantManager));
+            var waitress = new Waitress("Sexy Mary", threadedCook);
 
-            cashier.Start();
-            assistantManager.Start();
-            cook.Start();
+            threadedCashier.Start();
+            threadedAssistantManager.Start();
+            threadedCook.Start();
 
             for (int i = 0; i < 2; i++)
             {
@@ -33,10 +33,11 @@ namespace RestaurantKata
 
             for (int i = 0; i < 2; i++)
             {
-                cashier.Consumer.PayBill(i, 100M);
+                threadedCashier.Consumer.PayBill(i, 100M);
                 Console.WriteLine("Paid bill for table: " + i);
             }
 
+            Console.WriteLine("Press enter to finish...");
             Console.ReadLine();
         }
     }
