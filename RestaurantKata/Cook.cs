@@ -9,9 +9,9 @@ namespace RestaurantKata
 {
     public class Cook : IOrderConsumer
     {
-        private readonly IOrderConsumer _nextStep;
+        private readonly IOrderConsumer nextStep;
 
-        private readonly Dictionary<string, string[]> _recipes =
+        private readonly Dictionary<string, string[]> recipes =
             new Dictionary<string, string[]>()
                 {
                     { "Sake", new[] { "Bottle of sake" } },
@@ -22,26 +22,26 @@ namespace RestaurantKata
         public Cook(IOrderConsumer nextStep)
         {
             Name = Guid.NewGuid().ToString();
-            _nextStep = nextStep;
+            this.nextStep = nextStep;
         }
 
         public string Name { get; set; }
 
         private void PrepareFood(Order order)
         {
-            Thread.Sleep(500);
+            Thread.Sleep(new Random().Next(0, 1000));
             Console.WriteLine("Food prepared by: " + Name);
             order.CookTime = 500;
             foreach (var item in order.Items)
             {
-                item.Ingredients = _recipes[item.ItemDescription];
+                item.Ingredients = recipes[item.ItemDescription];
             }
         }
 
         public void Consume(Order order)
         {
             PrepareFood(order);
-            _nextStep.Consume(order);
+            nextStep.Consume(order);
         }
     }
 

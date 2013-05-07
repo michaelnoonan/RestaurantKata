@@ -1,29 +1,29 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace RestaurantKata
 {
     public class Cashier : IOrderConsumer
     {
-        private readonly IOrderConsumer _nextStep;
-        private readonly ConcurrentDictionary<int, Order> _unpaidOrders = new ConcurrentDictionary<int, Order>();
-        private readonly ConcurrentDictionary<int, Order> _paidOrders = new ConcurrentDictionary<int, Order>();
+        private readonly IOrderConsumer nextStep;
+        private readonly ConcurrentDictionary<string, Order> unpaidOrders = new ConcurrentDictionary<string, Order>();
 
         public Cashier(IOrderConsumer nextStep)
         {
-            _nextStep = nextStep;
+            this.nextStep = nextStep;
         }
 
         public void Consume(Order order)
         {
             TotalOrder(order);
             SaveOrder(order);
-            _nextStep.Consume(order);
+            nextStep.Consume(order);
         }
 
         private void SaveOrder(Order order)
         {
-            _unpaidOrders[order.TableNumber] = order;
+            unpaidOrders[order.Id] = order;
         }
 
         private void TotalOrder(Order order)
@@ -36,26 +36,21 @@ namespace RestaurantKata
             order.Total = order.Subtotal + order.Vat;
         }
 
-        public void PayBill(int tableNumber, decimal amountPaid)
+        public IEnumerable<Order> GetOrdersReadyToPay()
         {
-            Order order;
-            if (_unpaidOrders.TryRemove(tableNumber, out order))
+            return unpaidOrders.Values;
+        }
+
+        public void PayBill(Order order)
+        {
+            if (unpaidOrders.TryRemove(order.Id, out order))
             {
-                if (amountPaid >= order.Total)
-                {
-                    order.Paid = true;
-                    _paidOrders[tableNumber] = order;
-                }
+                order.Paid = true;
             }
             else
             {
                 throw new Exception("Ahhhhh, this should never happen?");
             }
-        }
-
-        public bool IsBillReadyToPay(int tableNumber)
-        {
-            return _unpaidOrders.ContainsKey(tableNumber);
         }
     }
 }
