@@ -6,6 +6,11 @@ namespace RestaurantKata.Infrastructure
 {
     public class TopicPubSub
     {
+        static TopicPubSub()
+        {
+            Instance = new TopicPubSub();
+        }
+
         readonly ConcurrentDictionary<string, MultiPlexer> subscriptions = new ConcurrentDictionary<string, MultiPlexer>();
 
         public void Subscribe(string topic, IOrderConsumer consumer)
@@ -22,6 +27,11 @@ namespace RestaurantKata.Infrastructure
         {
             var subscribers = subscriptions[topic];
             subscribers.Consume(order);
+        }
+
+        public static TopicPubSub Instance
+        {
+            get; private set;
         }
     }
 
