@@ -1,36 +1,56 @@
-﻿using NUnit.Framework;
+﻿using System.Runtime.Serialization;
+using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RestaurantKata.Infrastructure;
 
 namespace RestaurantKata
 {
-    public class Order
+    [DataContract]
+    public class Order : ExtensibleDynamicObject
     {
+        [DataMember]
         public string CustomerCategory { get; set; }
+        [DataMember]
         public int TableNumber { get; set; }
+        [DataMember]
         public string Server { get; set; }
+        [DataMember]
         public decimal Vat { get; set; }
-        public decimal Subtotal { get; set; }
+        [DataMember]
         public decimal Total { get; set; }
-        public int Cooktime { get; set; }
+        [DataMember]
+        public decimal Subtotal { get; set; }
+        [DataMember]
+        public int CookTime { get; set; }
+        [DataMember]
         public string Id { get; set; }
+        [DataMember]
         public Item[] Items { get; set; }
+        [DataMember]
         public bool Paid { get; set; }
     }
 
+    [DataContract]
     public class Item
     {
+        [DataMember]
+        public string ItemDescription { get; set; }
+        [DataMember]
+        public decimal Quantity { get; set; }
+        [DataMember]
+        public decimal? Price { get; set; }
+        [DataMember]
+        public string[] Ingredients { get; set; }
+
         public Item(string itemDescription, decimal quantity)
         {
             ItemDescription = itemDescription;
             Quantity = quantity;
         }
-
-        public string ItemDescription { get; set; }
-        public decimal Quantity { get; set; }
-        public decimal? Price { get; set; }
-        public string[] Ingredients { get; set; }
     }
+
+   
 
     public class WaitressOrder
     {

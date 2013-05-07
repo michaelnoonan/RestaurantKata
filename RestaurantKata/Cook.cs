@@ -26,7 +26,7 @@ namespace RestaurantKata
         private void PrepareFood(Order order)
         {
             Thread.Sleep(500);
-            order.Cooktime = 500;
+            order.CookTime = 500;
             foreach (var item in order.Items)
             {
                 item.Ingredients = _recipes[item.ItemDescription];

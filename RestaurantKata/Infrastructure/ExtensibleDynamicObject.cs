@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
 
-namespace RestaurantKata
+namespace RestaurantKata.Infrastructure
 {
     public class ExtensibleDynamicObject : DynamicObject
     {
