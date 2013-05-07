@@ -18,7 +18,7 @@ namespace RestaurantKata
             var threadedAssistantManager = new ThreadedConsumer<IOrderConsumer>(new AssistantManager(threadedCashier));
             var threadedCooks = new List<ThreadedConsumer<IOrderConsumer>>();
             const int numberOfCooks = 3;
-            for (int i = 0; i < numberOfCooks; i++)
+            for (var i = 0; i < numberOfCooks; i++)
             {
                 threadedCooks.Add(new ThreadedConsumer<IOrderConsumer>(new Cook(threadedAssistantManager)));
             }
