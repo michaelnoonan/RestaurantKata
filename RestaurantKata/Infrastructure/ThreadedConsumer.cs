@@ -1,20 +1,33 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace RestaurantKata.Infrastructure
 {
-    public class ThreadedConsumer<T> : IOrderConsumer, IStartable
-        where T : IOrderConsumer
+    public class ThreadedConsumer<T> : IOrderConsumer, IStartable where T : IOrderConsumer
     {
-        public T Consumer { get { return _consumer; } }
-        private readonly T _consumer;
-        private readonly ConcurrentQueue<Order> _ordersToProcess = new ConcurrentQueue<Order>();
+        public T Consumer { get { return consumer; } }
+        public string QueneName 
+        {
+            get { return consumer.GetType().Name; }
+        }
+
+        public int CountOfItemsInQueue {
+            get
+            {
+                return ordersToProcess.Count;
+            }
+        }
+
+        private readonly T consumer;
+        private readonly ConcurrentQueue<Order> ordersToProcess = new ConcurrentQueue<Order>();
 
         public ThreadedConsumer(T consumer)
         {
-            _consumer = consumer;
+            this.consumer = consumer;
         }
 
         public void Start()
@@ -27,9 +40,9 @@ namespace RestaurantKata.Infrastructure
             while (true)
             {
                 Order order;
-                if (_ordersToProcess.TryDequeue(out order))
+                if (ordersToProcess.TryDequeue(out order))
                 {
-                    _consumer.Consume(order);
+                    consumer.Consume(order);
                 }
                 else
                 {
@@ -40,7 +53,7 @@ namespace RestaurantKata.Infrastructure
 
         public void Consume(Order order)
         {
-            _ordersToProcess.Enqueue(order);
+            ordersToProcess.Enqueue(order);
         }
     }
 }

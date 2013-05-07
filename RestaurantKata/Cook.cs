@@ -10,6 +10,7 @@ namespace RestaurantKata
     public class Cook : IOrderConsumer
     {
         private readonly IOrderConsumer nextStep;
+        private readonly int cookingDelay;
 
         private readonly Dictionary<string, string[]> recipes =
             new Dictionary<string, string[]>()
@@ -23,15 +24,16 @@ namespace RestaurantKata
         {
             Name = Guid.NewGuid().ToString();
             this.nextStep = nextStep;
+            cookingDelay = new Random().Next(100, 2000);
         }
 
         public string Name { get; set; }
 
         private void PrepareFood(Order order)
         {
-            Thread.Sleep(new Random().Next(0, 1000));
+            order.CookTime = cookingDelay;
+            Thread.Sleep(cookingDelay);
             Console.WriteLine("Food prepared by: " + Name);
-            order.CookTime = 500;
             foreach (var item in order.Items)
             {
                 item.Ingredients = recipes[item.ItemDescription];
