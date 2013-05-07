@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using RestaurantKata.Infrastructure;
@@ -11,8 +10,6 @@ namespace RestaurantKata
     {
         static void Main()
         {
-            var monitor = new QueueMonitor();
-
             var cashier = new Cashier(new ConsoleOrderConsumerProcessor());
             var threadedCashier = new ThreadedConsumer<IOrderConsumer>(cashier);
             var threadedAssistantManager = new ThreadedConsumer<IOrderConsumer>(new AssistantManager(threadedCashier));
@@ -32,6 +29,7 @@ namespace RestaurantKata
             threadedCashier.Start();
             threadedAssistantManager.Start();
 
+            var monitor = new QueueMonitor();
             monitor.AddComponent(threadedCashier);
             monitor.AddComponent(threadedAssistantManager);
             monitor.AddComponents(threadedCooks);
@@ -43,14 +41,14 @@ namespace RestaurantKata
             
             for (var i = 0; i < numberOfOrders; i++)
             {
-                var id = waitress.PlaceOrder(i, i % 2 == 0 ? "good looking" : "dodgy", new[]
-                                                     {
-                                                         new Item("Sushi", 2),
-                                                         new Item("Clean glass", 2),
-                                                         new Item("Sake", 2),
-                                                     });
+                var orderId = waitress.PlaceOrder(i, i % 2 == 0 ? "good looking" : "dodgy", new[]
+                {
+                    new Item("Sushi", 2),
+                    new Item("Clean glass", 2),
+                    new Item("Sake", 2),
+                });
                 
-                startTimes.Add(id, DateTime.Now);
+                startTimes.Add(orderId, DateTime.Now);
             }
 
             var ordersPaid = 0;
@@ -69,6 +67,7 @@ namespace RestaurantKata
             } while (ordersPaid < numberOfOrders);
 
             Thread.Sleep(1000);
+
             Console.WriteLine(buffer.ToString());
             Console.WriteLine("Press enter to finish...");
             Console.ReadLine();

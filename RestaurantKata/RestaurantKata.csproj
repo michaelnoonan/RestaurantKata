@@ -54,9 +54,11 @@
   <ItemGroup>
     <Compile Include="AssistantManager.cs" />
     <Compile Include="Cashier.cs" />
+    <Compile Include="Infrastructure\ConsoleOrderConsumerProcessor.cs" />
     <Compile Include="Infrastructure\ExtensibleDynamicObject.cs" />
     <Compile Include="Infrastructure\IStartable.cs" />
     <Compile Include="Infrastructure\OrderDispatcher.cs" />
+    <Compile Include="Infrastructure\QueueMonitor.cs" />
     <Compile Include="Infrastructure\ThreadedConsumer.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Cook.cs" />
