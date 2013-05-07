@@ -23,7 +23,8 @@ namespace RestaurantKata
                                 Server = Name,
                                 TableNumber = tableNumber,
                                 CustomerCategory = customerCategory,
-                                Items = items
+                                Items = items,
+                                TimeToLive =  DateTime.Now.AddSeconds(5)
                             };
 
             nextStep.Consume(order);

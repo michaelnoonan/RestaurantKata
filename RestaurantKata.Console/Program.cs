@@ -20,14 +20,15 @@ namespace RestaurantKata
             const int numberOfCooks = 3;
             for (var i = 0; i < numberOfCooks; i++)
             {
-                threadedCooks.Add(new ThreadedConsumer<IOrderConsumer>(new Cook(threadedAssistantManager)));
+                var threadedCook = new ThreadedConsumer<IOrderConsumer>(new TimeToLiveHandler(new Cook(threadedAssistantManager)));
+                threadedCooks.Add(threadedCook);
             }
                 
             var dispatcher = new ThreadedConsumer<IOrderConsumer>(new OrderDispatcher(threadedCooks), int.MaxValue);
             var waitress = new Waitress("Sexy Mary", dispatcher);
             
             dispatcher.Start();
-            foreach (var cook in threadedCooks.OfType<IStartable>()) cook.Start();
+            foreach (var cook in threadedCooks) cook.Start();
             threadedCashier.Start();
             threadedAssistantManager.Start();
 
@@ -37,7 +38,7 @@ namespace RestaurantKata
             monitor.AddComponent(dispatcher);
             monitor.Start();
 
-            const int numberOfOrders = 250;
+            const int numberOfOrders = 200;
             var startTimes = new Dictionary<string, DateTime>();
             
             for (var i = 0; i < numberOfOrders; i++)
@@ -48,6 +49,7 @@ namespace RestaurantKata
                                                          new Item("Clean glass", 2),
                                                          new Item("Sake", 2),
                                                      });
+                
                 startTimes.Add(id, DateTime.Now);
             }
 

@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,6 +30,8 @@ namespace RestaurantKata
         public Item[] Items { get; set; }
         [DataMember]
         public bool Paid { get; set; }
+        [DataMember]
+        public DateTime TimeToLive { get; set; }
     }
 
     [DataContract]

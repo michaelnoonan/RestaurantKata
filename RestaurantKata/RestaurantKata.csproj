@@ -63,6 +63,7 @@
     <Compile Include="Given.cs" />
     <Compile Include="IOrderConsumer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Infrastructure\TimeToLiveHandler.cs" />
     <Compile Include="Waitress.cs" />
   </ItemGroup>
   <ItemGroup>
