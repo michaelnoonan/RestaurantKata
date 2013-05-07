@@ -1,13 +1,11 @@
-using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
+using System.Collections.Concurrent;
 
 namespace RestaurantKata
 {
     public class Cashier : IOrderConsumer
     {
         private readonly IOrderConsumer _nextStep;
-        private readonly List<Order> _unpaidOrders = new List<Order>();
+        private readonly ConcurrentDictionary<int, Order> _unpaidOrders = new ConcurrentDictionary<int, Order>();
 
         public Cashier(IOrderConsumer nextStep)
         {
@@ -23,7 +21,7 @@ namespace RestaurantKata
 
         private void SaveOrder(Order order)
         {
-            _unpaidOrders.Add(order);
+            _unpaidOrders[order.TableNumber] = order;
         }
 
         private void TotalOrder(Order order)
@@ -38,7 +36,7 @@ namespace RestaurantKata
 
         public void PayBill(int tableNumber, decimal amountPaid)
         {
-            var order = _unpaidOrders.Single(x => x.TableNumber == tableNumber);
+            var order = _unpaidOrders[tableNumber];
             if (order.Total <= amountPaid) order.Paid = true;
         }
     }

@@ -53,6 +53,8 @@
   <ItemGroup>
     <Compile Include="AssistantManager.cs" />
     <Compile Include="Cashier.cs" />
+    <Compile Include="Infrastructure\IStartable.cs" />
+    <Compile Include="Infrastructure\ThreadedConsumer.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Cook.cs" />
     <Compile Include="Given.cs" />

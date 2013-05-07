@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using RestaurantKata.Infrastructure;
 
 namespace RestaurantKata
 {
@@ -8,10 +10,14 @@ namespace RestaurantKata
     {
         static void Main(string[] args)
         {
-            var cashier = new Cashier(new ConsoleOrderConsumerProcessor());
-            var assistantManager = new AssistantManager(cashier);
-            var cook = new Cook(assistantManager);
+            var cashier = new ThreadedConsumer<Cashier>(new Cashier(new ConsoleOrderConsumerProcessor()));
+            var assistantManager = new ThreadedConsumer<AssistantManager>(new AssistantManager(cashier));
+            var cook = new ThreadedConsumer<Cook>(new Cook(assistantManager));
             var waitress = new Waitress("Sexy Mary", cook);
+
+            cashier.Start();
+            assistantManager.Start();
+            cook.Start();
 
             for (int i = 0; i < 2; i++)
             {
@@ -21,7 +27,14 @@ namespace RestaurantKata
                                                          new Item("Clean glass", 2),
                                                          new Item("Sake", 2),
                                                      });
-                cashier.PayBill(i, 100M);
+            }
+
+            Thread.Sleep(5000);
+
+            for (int i = 0; i < 2; i++)
+            {
+                cashier.Consumer.PayBill(i, 100M);
+                Console.WriteLine("Paid bill for table: " + i);
             }
 
             Console.ReadLine();
