@@ -11,7 +11,7 @@ namespace RestaurantKata
     {
         private readonly IOrderConsumer nextStep;
         private readonly int cookingDelay;
-        private static Random random = new Random();
+        private static readonly Random Random = new Random();
 
         private readonly Dictionary<string, string[]> recipes =
             new Dictionary<string, string[]>()
@@ -25,7 +25,7 @@ namespace RestaurantKata
         {
             Name = Guid.NewGuid().ToString();
             this.nextStep = nextStep;
-            cookingDelay = random.Next(100, 2000);
+            cookingDelay = Random.Next(100, 2000);
         }
 
         public string Name { get; set; }
@@ -41,10 +41,10 @@ namespace RestaurantKata
             }
         }
 
-        public void Consume(Order order)
+        public bool Consume(Order order)
         {
             PrepareFood(order);
-            nextStep.Consume(order);
+            return nextStep.Consume(order);
         }
     }
 

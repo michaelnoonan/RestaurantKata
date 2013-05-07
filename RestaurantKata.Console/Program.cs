@@ -23,10 +23,10 @@ namespace RestaurantKata
                 threadedCooks.Add(new ThreadedConsumer<IOrderConsumer>(new Cook(threadedAssistantManager)));
             }
                 
-            var roundRobinCook = new ThreadedConsumer<IOrderConsumer>(new RoundRobinConsumer(threadedCooks));
-            var waitress = new Waitress("Sexy Mary", roundRobinCook);
+            var dispatcher = new ThreadedConsumer<IOrderConsumer>(new OrderDispatcher(threadedCooks), int.MaxValue);
+            var waitress = new Waitress("Sexy Mary", dispatcher);
             
-            roundRobinCook.Start();
+            dispatcher.Start();
             foreach (var cook in threadedCooks.OfType<IStartable>()) cook.Start();
             threadedCashier.Start();
             threadedAssistantManager.Start();
@@ -34,7 +34,7 @@ namespace RestaurantKata
             monitor.AddComponent(threadedCashier);
             monitor.AddComponent(threadedAssistantManager);
             monitor.AddComponents(threadedCooks);
-            monitor.AddComponent(roundRobinCook);
+            monitor.AddComponent(dispatcher);
             monitor.Start();
 
             const int numberOfOrders = 250;

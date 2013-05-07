@@ -14,11 +14,11 @@ namespace RestaurantKata
             this.nextStep = nextStep;
         }
 
-        public void Consume(Order order)
+        public bool Consume(Order order)
         {
             TotalOrder(order);
             SaveOrder(order);
-            nextStep.Consume(order);
+            return nextStep.Consume(order);
         }
 
         private void SaveOrder(Order order)

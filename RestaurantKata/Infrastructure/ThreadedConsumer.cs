@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,11 +21,13 @@ namespace RestaurantKata.Infrastructure
         }
 
         private readonly T consumer;
+        private readonly int queueLimit;
         private readonly ConcurrentQueue<Order> ordersToProcess = new ConcurrentQueue<Order>();
 
-        public ThreadedConsumer(T consumer)
+        public ThreadedConsumer(T consumer, int queueLimit = 10)
         {
             this.consumer = consumer;
+            this.queueLimit = queueLimit;
         }
 
         public void Start()
@@ -51,9 +51,11 @@ namespace RestaurantKata.Infrastructure
             }
         }
 
-        public void Consume(Order order)
+        public bool Consume(Order order)
         {
+            if (ordersToProcess.Count >= queueLimit) return false;
             ordersToProcess.Enqueue(order);
+            return true;
         }
     }
 }

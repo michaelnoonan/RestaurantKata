@@ -7,7 +7,7 @@ namespace RestaurantKata
 {
     public class AssistantManager : IOrderConsumer
     {
-        private readonly IDictionary<string, decimal> _priceList =
+        private readonly IDictionary<string, decimal> priceList =
             new Dictionary<string, decimal>
                 {
                     { "Sake", 15M },
@@ -15,24 +15,24 @@ namespace RestaurantKata
                     { "Clean glass", 50M },
                 };
 
-        private readonly IOrderConsumer _nextStep;
+        private readonly IOrderConsumer nextStep;
 
         public AssistantManager(IOrderConsumer nextStep)
         {
-            _nextStep = nextStep;
+            this.nextStep = nextStep;
         }
 
-        public void Consume(Order order)
+        public bool Consume(Order order)
         {
             PriceOrder(order);
-            _nextStep.Consume(order);
+            return nextStep.Consume(order);
         }
 
         private void PriceOrder(Order order)
         {
             foreach (var item in order.Items)
             {
-                item.Price = _priceList[item.ItemDescription];
+                item.Price = priceList[item.ItemDescription];
             }
         }
     }

@@ -5,14 +5,16 @@ namespace RestaurantKata
 {
     public class ConsoleOrderConsumerProcessor : IOrderConsumer
     {
-        public void Consume(Order order)
+        public bool Consume(Order order)
         {
             var settings = new JsonSerializerSettings
                            {
                                Formatting = Formatting.Indented,
                                ContractResolver = new CamelCasePropertyNamesContractResolver()
                            };
-            
+
+            return true;
+
             //Console.WriteLine(JsonConvert.SerializeObject(order, settings));
         }
     }

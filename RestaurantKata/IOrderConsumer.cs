@@ -2,6 +2,6 @@
 {
     public interface IOrderConsumer
     {
-        void Consume(Order order);
+        bool Consume(Order order);
     }
 }
