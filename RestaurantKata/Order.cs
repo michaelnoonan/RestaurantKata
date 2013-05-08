@@ -31,6 +31,10 @@ namespace RestaurantKata
     public class OrderPaid : OrderEventBase {}
     public class OrderCompleted : OrderEventBase {}
 
+    public class OrderDropped : OrderEventBase
+    {
+    }
+
     [DataContract]
     public class Order : ExtensibleDynamicObject
     {

@@ -63,8 +63,10 @@
     <Compile Include="Infrastructure\Alarm\WakeUpCall.cs" />
     <Compile Include="Infrastructure\ConsoleConsumeProcessor.cs" />
     <Compile Include="Infrastructure\ExtensibleDynamicObject.cs" />
+    <Compile Include="Infrastructure\FlakyConsumer.cs" />
     <Compile Include="Infrastructure\IHaveAQueue.cs" />
     <Compile Include="Infrastructure\IStartable.cs" />
+    <Compile Include="Infrastructure\Logger.cs" />
     <Compile Include="Infrastructure\Midget.cs" />
     <Compile Include="Infrastructure\MidgetHouse.cs" />
     <Compile Include="Infrastructure\MultiPlexer.cs" />

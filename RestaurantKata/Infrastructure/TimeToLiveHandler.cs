@@ -15,7 +15,8 @@ namespace RestaurantKata.Infrastructure
         {
             if (message.Order.TimeToLive < DateTime.Now)
             {
-                Console.WriteLine("Order dropped. Id {0}", message.Order.Id);
+                Logger.Error("Order dropped. Id {0}", message.Order.Id);
+                TopicPubSub.Instance.Publish(message.CorrelationId, new OrderDropped(){Order =  message.Order});
             }
             else
             {

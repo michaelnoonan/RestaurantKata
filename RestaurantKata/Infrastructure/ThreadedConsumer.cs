@@ -46,7 +46,10 @@ namespace RestaurantKata.Infrastructure
                 TMessage message;
                 if (messagesToProcess.TryDequeue(out message))
                 {
-                    consumer.Consume(message);
+                    if (!consumer.Consume(message))
+                    {
+                        messagesToProcess.Enqueue(message);
+                    }
                 }
                 else
                 {

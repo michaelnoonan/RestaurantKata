@@ -23,7 +23,7 @@ namespace RestaurantKata
                                 TableNumber = tableNumber,
                                 CustomerCategory = customerCategory,
                                 Items = items,
-                                TimeToLive =  DateTime.Now.AddSeconds(5)
+                                TimeToLive =  DateTime.Now.AddSeconds(10)
                             };
 
             TopicPubSub.Instance.Publish(Topics.NewOrders, new OrderPlaced { Order = order });

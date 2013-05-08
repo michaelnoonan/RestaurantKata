@@ -7,5 +7,6 @@
         public const string Pricing = "Pricing";
         public const string Payment = "Payment";
         public const string CompletedOrders = "CompletedOrders";
+        public const string WakeUpCalls = "WakeUpCalls";
     }
 }

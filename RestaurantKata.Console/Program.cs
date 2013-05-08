@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using RestaurantKata.Infrastructure;
+using RestaurantKata.Infrastructure.Alarm;
 
 namespace RestaurantKata
 {
@@ -21,6 +22,7 @@ namespace RestaurantKata
             var assistantManager = PrepareAssistantManager();
             var cashier = new Cashier();
             var threadedCashier = PrepareThreadedCashier(cashier);
+            var alarmClock = PrepareAlarmClock();
 
             var midgetHouse = new MidgetHouse();
             TopicPubSub.Instance.Subscribe<OrderPlaced>(Topics.NewOrders, midgetHouse);
@@ -28,6 +30,7 @@ namespace RestaurantKata
             TopicPubSub.Instance.Subscribe(Topics.Pricing, assistantManager);
             TopicPubSub.Instance.Subscribe(Topics.Payment, threadedCashier);
             TopicPubSub.Instance.Subscribe<OrderCompleted>(Topics.CompletedOrders, midgetHouse);
+            TopicPubSub.Instance.Subscribe(Topics.WakeUpCalls, alarmClock);
 
             Start();
 
@@ -44,6 +47,14 @@ namespace RestaurantKata
             Console.WriteLine("Press enter to finish...");
 
             Console.ReadLine();
+        }
+
+        private static ThreadedConsumer<WakeUpCall> PrepareAlarmClock()
+        {
+            var alarmClock = new ThreadedConsumer<WakeUpCall>("AlarmClock", new AlarmClock(new DateTimeComparer()));
+            MonitoredConsumers.Add(alarmClock);
+            StartableThings.Add(alarmClock);
+            return alarmClock;
         }
 
         private static ThreadedConsumer<OrderReadyForPayment> PrepareThreadedCashier(Cashier cashier)
@@ -78,7 +89,7 @@ namespace RestaurantKata
             const int numberOfCooks = 3;
             for (var i = 0; i < numberOfCooks; i++)
             {
-                var threadedCook = new ThreadedConsumer<OrderReadyToCook>("Cook", new TimeToLiveHandler(new Cook()));
+                var threadedCook = new ThreadedConsumer<OrderReadyToCook>("Cook", new TimeToLiveHandler(new FlakyConsumer<OrderReadyToCook>(new Cook())));
                 threadedCooks.Add(threadedCook);
                 MonitoredConsumers.Add(threadedCook);
                 StartableThings.Add(threadedCook);
@@ -109,8 +120,7 @@ namespace RestaurantKata
                 {
                     cashier.PayBill(order);
                     var startTime = startTimes[order.Id];
-                    buffer.AppendFormat("Order paid. Time: {0} Id {1} {2}", (DateTime.Now - startTime), order.Id,
-                                        Environment.NewLine);
+                    Logger.Info("Order paid. Time: {0} Id {1}", (DateTime.Now - startTime), order.Id);
                     ordersPaid++;
                 }
             } while (ordersPaid < numberOfOrders);

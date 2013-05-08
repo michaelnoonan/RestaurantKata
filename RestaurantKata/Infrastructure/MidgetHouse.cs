@@ -14,6 +14,7 @@ namespace RestaurantKata.Infrastructure
             TopicPubSub.Instance.Subscribe<FoodCooked>(message.Order.CorrelationId, midget);
             TopicPubSub.Instance.Subscribe<OrderPriced>(message.Order.CorrelationId, midget);
             TopicPubSub.Instance.Subscribe<OrderPaid>(message.Order.CorrelationId, midget);
+            TopicPubSub.Instance.Subscribe<OrderDropped>(message.Order.CorrelationId, midget);
             //TODO: Make it work with reflection
             //TopicPubSub.Instance.SubscribeAll(message.Order.CorrelationId, midget);
             midget.StartOrder(message.Order);

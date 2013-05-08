@@ -1,37 +1,21 @@
 ﻿namespace RestaurantKata.Infrastructure.Alarm
 {
-    public class AlarmClock
+    public class AlarmClock : IConsume<WakeUpCall>
     {
-        private readonly IAlarmStorage _storage;
-        private readonly IDateTimeComparer _comparer;
+        private readonly IDateTimeComparer comparer;
 
-        public AlarmClock(IAlarmStorage storage, IDateTimeComparer comparer)
+
+        public AlarmClock(IDateTimeComparer comparer)
         {
-            _storage = storage;
-            _comparer = comparer;
+            this.comparer = comparer;
         }
 
-        public void Start()
+        public bool Consume(WakeUpCall message)
         {
+            if (comparer.IsInTheFuture(message.DateTime)) return false;
 
-        }
-
-        public void Do()
-        {
-            var wakeUpCall = _storage.Dequeue();
-            if (_comparer.IsInTheFuture(wakeUpCall.DateTime))
-            {
-                _storage.Enqueue(wakeUpCall);
-            }
-            else
-            {
-                wakeUpCall.Callback();
-            }
-        }
-
-        public void SetAlarm(WakeUpCall wakeUpCall)
-        {
-            _storage.Enqueue(wakeUpCall);
+            message.Callback();
+            return true;
         }
     }
 }
