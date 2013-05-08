@@ -11,27 +11,57 @@ namespace RestaurantKata
     public class Order : ExtensibleDynamicObject
     {
         [DataMember]
+        public string Id { get; set; }
+        [DataMember]
+        public string CausationId { get; set; }
+        [DataMember]
+        public string CorrelationId { get { return Id; } }
+
+        [DataMember]
         public string CustomerCategory { get; set; }
         [DataMember]
         public int TableNumber { get; set; }
         [DataMember]
         public string Server { get; set; }
         [DataMember]
-        public decimal Vat { get; set; }
+        public decimal? Vat { get; set; }
         [DataMember]
-        public decimal Total { get; set; }
+        public decimal? Total { get; set; }
         [DataMember]
-        public decimal Subtotal { get; set; }
+        public decimal? Subtotal { get; set; }
         [DataMember]
-        public int CookTime { get; set; }
-        [DataMember]
-        public string Id { get; set; }
+        public int? CookTime { get; set; }
         [DataMember]
         public Item[] Items { get; set; }
         [DataMember]
         public bool Paid { get; set; }
         [DataMember]
         public DateTime TimeToLive { get; set; }
+
+        public bool IsCooked()
+        {
+            return CookTime.HasValue;
+        }
+
+        public bool IsPriced()
+        {
+            return Total.HasValue;
+        }
+
+        public bool IsPaid()
+        {
+            return Paid;
+        }
+
+        public bool IsCompleted()
+        {
+            return IsCooked() && IsPriced() && IsPaid();
+        }
+
+        public bool IsNew()
+        {
+            return !(IsCooked() && IsPriced() && IsPaid());
+        }
     }
 
     [DataContract]

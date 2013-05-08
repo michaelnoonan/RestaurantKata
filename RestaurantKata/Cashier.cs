@@ -18,7 +18,7 @@ namespace RestaurantKata
         {
             TotalOrder(order);
             SaveOrder(order);
-            return nextStep.Consume(order);
+            return true;
         }
 
         private void SaveOrder(Order order)
@@ -46,6 +46,7 @@ namespace RestaurantKata
             if (unpaidOrders.TryRemove(order.Id, out order))
             {
                 order.Paid = true;
+                nextStep.Consume(order);
             }
             else
             {
