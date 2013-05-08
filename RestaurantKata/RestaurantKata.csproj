@@ -68,6 +68,7 @@
     <Compile Include="Infrastructure\Midget.cs" />
     <Compile Include="Infrastructure\MidgetHouse.cs" />
     <Compile Include="Infrastructure\MultiPlexer.cs" />
+    <Compile Include="Infrastructure\NarrowingConsumer.cs" />
     <Compile Include="Infrastructure\OrderDispatcher.cs" />
     <Compile Include="Infrastructure\QueueMonitor.cs" />
     <Compile Include="Infrastructure\ThreadedConsumer.cs" />
