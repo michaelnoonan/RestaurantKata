@@ -14,7 +14,7 @@
         {
             if (comparer.IsInTheFuture(message.DateTime)) return false;
 
-            message.Callback();
+            TopicPubSub.Instance.Publish(message.Topic, message.MessageForWakeUpCall);
             return true;
         }
     }

@@ -4,14 +4,15 @@ namespace RestaurantKata.Infrastructure.Alarm
 {
     public class WakeUpCall : IEvent
     {
-        public WakeUpCall(DateTime dateTime, Action callback)
+        public WakeUpCall(DateTime dateTime)
         {
             DateTime = dateTime;
-            Callback = callback;
         }
 
         public DateTime DateTime { get; set; }
-        public Action Callback { get; set; }
+        public string Topic { get; set; }
         public string CorrelationId { get; private set; }
+
+        public CheckeFoodIsCooked MessageForWakeUpCall { get; set; }
     }
 }

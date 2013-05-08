@@ -35,6 +35,11 @@ namespace RestaurantKata
     {
     }
 
+    public class CheckeFoodIsCooked : OrderEventBase
+    {
+    }
+
+
     [DataContract]
     public class Order : ExtensibleDynamicObject
     {
