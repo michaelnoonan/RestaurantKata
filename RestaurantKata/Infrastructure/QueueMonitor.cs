@@ -7,24 +7,24 @@ namespace RestaurantKata.Infrastructure
 {
     public class QueueMonitor
     {
-        private readonly IList<ThreadedConsumer<IOrderConsumer>> components;
+        private readonly IList<IHaveAQueue> components;
 
         public QueueMonitor()
         {
-            components = new List<ThreadedConsumer<IOrderConsumer>>();
+            components = new List<IHaveAQueue>();
         }
 
-        public void AddComponents(IEnumerable<ThreadedConsumer<IOrderConsumer>> orderConsumers)
+        public void AddComponents(IEnumerable<IHaveAQueue> thingsWithAQueue)
         {
-            foreach (var orderConsumer in orderConsumers)
+            foreach (var thingWithQueue in thingsWithAQueue)
             {
-                AddComponent(orderConsumer);
+                AddComponent(thingWithQueue);
             }
         }
 
-        public void AddComponent(ThreadedConsumer<IOrderConsumer> orderConsumer)
+        public void AddComponent(IHaveAQueue thingWithQueue)
         {
-            components.Add(orderConsumer);
+            components.Add(thingWithQueue);
         }
 
         public void Start()

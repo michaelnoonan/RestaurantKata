@@ -2,26 +2,28 @@
 
 namespace RestaurantKata.Infrastructure
 {
-    public class MultiPlexer : IOrderConsumer
+    public class MultiPlexer : IConsume<IMessage>
     {
-        private readonly ConcurrentQueue<IOrderConsumer> consumers;
+        private readonly ConcurrentQueue<object> consumers;
 
-        public MultiPlexer(params IOrderConsumer[] consumers)
+        public MultiPlexer(params object[] consumers)
         {
-            this.consumers = new ConcurrentQueue<IOrderConsumer>(consumers);
+            this.consumers = new ConcurrentQueue<object>(consumers);
         }
 
-        public bool Consume(Order order)
+        public bool Consume(IMessage message)
         {
             foreach (var consumer in consumers)
             {
-                consumer.Consume(order);
+#warning Yeah, we should probably do this betterer
+                dynamic rockOnAndDoWhatISay = consumer;
+                rockOnAndDoWhatISay.Consume((dynamic)message);
             }
 
             return true;
         }
 
-        public void Add(IOrderConsumer consumer)
+        public void Add(object consumer)
         {
             consumers.Enqueue(consumer);
         }

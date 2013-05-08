@@ -2,22 +2,24 @@
 
 namespace RestaurantKata.Infrastructure
 {
-    public class MidgetHouse : IOrderConsumer
+    public class MidgetHouse :
+        IConsume<OrderPlaced>,
+        IConsume<OrderCompleted>
     {
         private readonly ConcurrentDictionary<string, Midget> house = new ConcurrentDictionary<string, Midget>();
 
-        public bool Consume(Order order)
+        public bool Consume(OrderPlaced message)
         {
-            if (order.IsNew())
-            {
-                var midget = house.GetOrAdd(order.CorrelationId, key => new Midget(key));
-                TopicPubSub.Instance.Subscribe(order.CorrelationId, midget);
-                TopicPubSub.Instance.Publish(order.CorrelationId, order);
-                return true;
-            }
+            var midget = house.GetOrAdd(message.Order.CorrelationId, key => new Midget(key));
+            TopicPubSub.Instance.Subscribe(message.Order.CorrelationId, midget);
+            midget.StartOrder(message.Order);
+            return true;
+        }
 
+        public bool Consume(OrderCompleted message)
+        {
             Midget unused;
-            house.TryRemove(order.CorrelationId, out unused);
+            house.TryRemove(message.Order.CorrelationId, out unused);
             return true;
         }
     }

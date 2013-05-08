@@ -8,9 +8,8 @@ using RestaurantKata.Infrastructure;
 
 namespace RestaurantKata
 {
-    public class Cook : IOrderConsumer
+    public class Cook : IConsume<OrderReadyToCook>
     {
-        private readonly IOrderConsumer nextStep;
         private readonly int cookingDelay;
         private static readonly Random random = new Random();
 
@@ -22,10 +21,9 @@ namespace RestaurantKata
                     { "Clean glass", new[] { "Clean glass" } },
                 };
 
-        public Cook(IOrderConsumer nextStep)
+        public Cook()
         {
             Name = Guid.NewGuid().ToString();
-            this.nextStep = nextStep;
             cookingDelay = random.Next(100, 2000);
             Console.WriteLine("Cooking delay {0}: {1}", Name, cookingDelay);
         }
@@ -43,38 +41,39 @@ namespace RestaurantKata
             }
         }
 
-        public bool Consume(Order order)
+        public bool Consume(OrderReadyToCook message)
         {
-            PrepareFood(order);
-            return nextStep.Consume(order);
+            PrepareFood(message.Order);
+            TopicPubSub.Instance.Publish(message.CorrelationId, new FoodCooked { Order = message.Order });
+            return true;
         }
     }
 
-    [TestFixture]
-    public class CookTests
-    {
-        [Test]
-        public void GivenAnOrder_TheNextStepShouldBeCalled()
-        {
-            var nextStep = Substitute.For<IOrderConsumer>();
-            var cook = new Cook(nextStep);
-            var order = Given.AnOrderForJapanese();
+    //[TestFixture]
+    //public class CookTests
+    //{
+    //    [Test]
+    //    public void GivenAnOrder_TheNextStepShouldBeCalled()
+    //    {
+    //        var nextStep = Substitute.For<IConsume>();
+    //        var cook = new Cook(nextStep);
+    //        var order = Given.AnOrderForJapanese();
             
-            cook.Consume(order);
+    //        cook.Consume(order);
 
-            nextStep.Received(1).Consume(order);
-        }
+    //        nextStep.Received(1).Consume(order);
+    //    }
 
-        [Test]
-        public void GivenAnOrder_TheOrderShouldBeEnrichedWithIngredients()
-        {
-            var nextStep = Substitute.For<IOrderConsumer>();
-            var cook = new Cook(nextStep);
-            var order = Given.AnOrderForJapanese();
+    //    [Test]
+    //    public void GivenAnOrder_TheOrderShouldBeEnrichedWithIngredients()
+    //    {
+    //        var nextStep = Substitute.For<IConsume>();
+    //        var cook = new Cook(nextStep);
+    //        var order = Given.AnOrderForJapanese();
             
-            cook.Consume(order);
+    //        cook.Consume(order);
 
-            Assert.That(order.Items.All(x => x.Ingredients.Any()));
-        }
-    }
+    //        Assert.That(order.Items.All(x => x.Ingredients.Any()));
+    //    }
+    //}
 }

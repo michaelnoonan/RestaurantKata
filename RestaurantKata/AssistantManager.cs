@@ -6,7 +6,7 @@ using RestaurantKata.Infrastructure;
 
 namespace RestaurantKata
 {
-    public class AssistantManager : IOrderConsumer
+    public class AssistantManager : IConsume<OrderReadyForPricing>
     {
         private readonly IDictionary<string, decimal> priceList =
             new Dictionary<string, decimal>
@@ -16,17 +16,11 @@ namespace RestaurantKata
                     { "Clean glass", 50M },
                 };
 
-        private readonly IOrderConsumer nextStep;
-
-        public AssistantManager(IOrderConsumer nextStep)
+        public bool Consume(OrderReadyForPricing message)
         {
-            this.nextStep = nextStep;
-        }
-
-        public bool Consume(Order order)
-        {
-            PriceOrder(order);
-            return nextStep.Consume(order);
+            PriceOrder(message.Order);
+            TopicPubSub.Instance.Publish(message.CorrelationId, new OrderPriced { Order = message.Order });
+            return true;
         }
 
         private void PriceOrder(Order order)
@@ -38,31 +32,31 @@ namespace RestaurantKata
         }
     }
 
-    [TestFixture]
-    public class AssistantManagerTests
-    {
-        [Test]
-        public void GivenAnOrder_CallsTheNextStep()
-        {
-            var nextStep = Substitute.For<IOrderConsumer>();
-            var assistantManager = new AssistantManager(nextStep);
-            var order = Given.AnOrderForJapanese();
+    //[TestFixture]
+    //public class AssistantManagerTests
+    //{
+    //    [Test]
+    //    public void GivenAnOrder_CallsTheNextStep()
+    //    {
+    //        var nextStep = Substitute.For<IConsume>();
+    //        var assistantManager = new AssistantManager(nextStep);
+    //        var order = Given.AnOrderForJapanese();
 
-            assistantManager.Consume(order);
+    //        assistantManager.Consume(order);
 
-            nextStep.Received(1).Consume(order);
-        }
+    //        nextStep.Received(1).Consume(order);
+    //    }
 
-        [Test]
-        public void GivenAnOrder_EnrichesOrderWithPrices()
-        {
-            var nextStep = Substitute.For<IOrderConsumer>();
-            var assistantManager = new AssistantManager(nextStep);
-            var order = Given.AnOrderForJapanese();
+    //    [Test]
+    //    public void GivenAnOrder_EnrichesOrderWithPrices()
+    //    {
+    //        var nextStep = Substitute.For<IConsume>();
+    //        var assistantManager = new AssistantManager(nextStep);
+    //        var order = Given.AnOrderForJapanese();
 
-            assistantManager.Consume(order);
+    //        assistantManager.Consume(order);
 
-            Assert.That(order.Items.All(x => x.Price.HasValue));
-        }
-    }
+    //        Assert.That(order.Items.All(x => x.Price.HasValue));
+    //    }
+    //}
 }

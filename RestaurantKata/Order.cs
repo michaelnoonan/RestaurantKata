@@ -7,6 +7,30 @@ using RestaurantKata.Infrastructure;
 
 namespace RestaurantKata
 {
+    public interface IMessage
+    {
+        string CorrelationId { get; }
+    }
+    public interface IEvent : IMessage {}
+    public abstract class OrderMessageBase : IMessage
+    {
+        public Order Order { get; set; }
+        public string CorrelationId { get { return Order.CorrelationId; } }
+    }
+    public abstract class OrderEventBase : OrderMessageBase, IEvent {}
+
+    public class OrderPlaced : OrderEventBase {}
+    public class OrderReadyToCook : OrderEventBase {}
+    
+    public class FoodCooked : OrderEventBase {}
+    public class OrderReadyForPricing : OrderEventBase {}
+    
+    public class OrderPriced : OrderEventBase {}
+    public class OrderReadyForPayment : OrderEventBase {}
+    
+    public class OrderPaid : OrderEventBase {}
+    public class OrderCompleted : OrderEventBase {}
+
     [DataContract]
     public class Order : ExtensibleDynamicObject
     {

@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace RestaurantKata.Infrastructure
 {
-    public class ThreadedConsumer<T> : IOrderConsumer, IStartable where T : IOrderConsumer
+    public class ThreadedConsumer<TMessage> : IStartable, IConsume<TMessage>, IHaveAQueue
+        where TMessage : IMessage
     {
-        public T Consumer { get { return consumer; } }
+        public IConsume<TMessage> Consumer { get { return consumer; } }
         public string Name 
         {
             get { return name; }
@@ -17,16 +18,16 @@ namespace RestaurantKata.Infrastructure
         {
             get
             {
-                return ordersToProcess.Count;
+                return messagesToProcess.Count;
             }
         }
 
         private readonly string name;
-        private readonly T consumer;
+        private readonly IConsume<TMessage> consumer;
         private readonly int queueLimit;
-        private readonly ConcurrentQueue<Order> ordersToProcess = new ConcurrentQueue<Order>();
+        private readonly ConcurrentQueue<TMessage> messagesToProcess = new ConcurrentQueue<TMessage>();
 
-        public ThreadedConsumer(string name, T consumer, int queueLimit = 10)
+        public ThreadedConsumer(string name, IConsume<TMessage> consumer, int queueLimit = 10)
         {
             this.name = name;
             this.consumer = consumer;
@@ -35,17 +36,17 @@ namespace RestaurantKata.Infrastructure
 
         public void Start()
         {
-            Task.Run((Action)DispatchOrders);
+            Task.Run((Action)StartProcessingMessages);
         }
 
-        private void DispatchOrders()
+        private void StartProcessingMessages()
         {
             while (true)
             {
-                Order order;
-                if (ordersToProcess.TryDequeue(out order))
+                TMessage message;
+                if (messagesToProcess.TryDequeue(out message))
                 {
-                    consumer.Consume(order);
+                    consumer.Consume(message);
                 }
                 else
                 {
@@ -54,10 +55,10 @@ namespace RestaurantKata.Infrastructure
             }
         }
 
-        public bool Consume(Order order)
+        public bool Consume(TMessage message)
         {
-            if (ordersToProcess.Count >= queueLimit) return false;
-            ordersToProcess.Enqueue(order);
+            if (messagesToProcess.Count >= queueLimit) return false;
+            messagesToProcess.Enqueue(message);
             return true;
         }
     }

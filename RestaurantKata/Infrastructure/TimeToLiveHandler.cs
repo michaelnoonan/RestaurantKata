@@ -2,24 +2,24 @@
 
 namespace RestaurantKata.Infrastructure
 {
-    public class TimeToLiveHandler : IOrderConsumer
+    public class TimeToLiveHandler : IConsume<OrderReadyToCook>
     {
-        private readonly IOrderConsumer nextStep;
+        private readonly IConsume<OrderReadyToCook> nextStep;
 
-        public TimeToLiveHandler(IOrderConsumer nextStep)
+        public TimeToLiveHandler(IConsume<OrderReadyToCook> nextStep)
         {
             this.nextStep = nextStep;
         }
 
-        public bool Consume(Order order)
+        public bool Consume(OrderReadyToCook message)
         {
-            if (order.TimeToLive < DateTime.Now)
+            if (message.Order.TimeToLive < DateTime.Now)
             {
-                Console.WriteLine("Order dropped. Id {0}", order.Id);
+                Console.WriteLine("Order dropped. Id {0}", message.Order.Id);
             }
             else
             {
-                return nextStep.Consume(order);
+                return nextStep.Consume(message);
             }
 
             return true;

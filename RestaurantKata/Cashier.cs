@@ -1,23 +1,18 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using RestaurantKata.Infrastructure;
 
 namespace RestaurantKata
 {
-    public class Cashier : IOrderConsumer
+    public class Cashier : IConsume<OrderReadyForPayment>
     {
-        private readonly IOrderConsumer nextStep;
         private readonly ConcurrentDictionary<string, Order> unpaidOrders = new ConcurrentDictionary<string, Order>();
 
-        public Cashier(IOrderConsumer nextStep)
+        public bool Consume(OrderReadyForPayment message)
         {
-            this.nextStep = nextStep;
-        }
-
-        public bool Consume(Order order)
-        {
-            TotalOrder(order);
-            SaveOrder(order);
+            TotalOrder(message.Order);
+            SaveOrder(message.Order);
             return true;
         }
 
@@ -46,7 +41,7 @@ namespace RestaurantKata
             if (unpaidOrders.TryRemove(order.Id, out order))
             {
                 order.Paid = true;
-                nextStep.Consume(order);
+                TopicPubSub.Instance.Publish(order.CorrelationId, new OrderPaid { Order = order });
             }
             else
             {

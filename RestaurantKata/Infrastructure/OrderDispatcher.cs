@@ -5,24 +5,25 @@ using System.Threading;
 
 namespace RestaurantKata.Infrastructure
 {
-    public class OrderDispatcher : IOrderConsumer
+    public class OrderDispatcher<TMessage> : IConsume<TMessage>
+        where TMessage : IMessage
     {
-        private readonly ConcurrentQueue<IOrderConsumer> consumers;
-        public OrderDispatcher(IEnumerable<IOrderConsumer> consumers)
+        private readonly ConcurrentQueue<IConsume<TMessage>> consumers;
+        public OrderDispatcher(IEnumerable<IConsume<TMessage>> consumers)
         {
-            this.consumers = new ConcurrentQueue<IOrderConsumer>(consumers);
+            this.consumers = new ConcurrentQueue<IConsume<TMessage>>(consumers);
         }
 
-        public bool Consume(Order order)
+        public bool Consume(TMessage message)
         {
             bool consumed;
             do
             {
-                IOrderConsumer nextConsumer;
+                IConsume<TMessage> nextConsumer;
                 if (consumers.TryDequeue(out nextConsumer))
                 {
                     consumers.Enqueue(nextConsumer);
-                    consumed = nextConsumer.Consume(order);
+                    consumed = nextConsumer.Consume(message);
                     if (!consumed) Thread.Sleep(100);                 
                 }
                 else

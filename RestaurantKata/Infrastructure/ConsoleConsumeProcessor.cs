@@ -3,9 +3,10 @@ using Newtonsoft.Json.Serialization;
 
 namespace RestaurantKata.Infrastructure
 {
-    public class ConsoleOrderConsumerProcessor : IOrderConsumer
+    public class ConsoleConsumeProcessor<TMessage> : IConsume<TMessage>
+        where TMessage : IMessage
     {
-        public bool Consume(Order order)
+        public bool Consume(TMessage message)
         {
             var settings = new JsonSerializerSettings
                            {

@@ -8,14 +8,18 @@ namespace RestaurantKata
 {
     class Program
     {
-        private static readonly IList<ThreadedConsumer<IOrderConsumer>> ThreadedConsumers = new List<ThreadedConsumer<IOrderConsumer>>(); 
+        private static readonly IList<IHaveAQueue> MonitoredConsumers = new List<IHaveAQueue>();
+        private static readonly IList<IStartable> StartableThings = new List<IStartable>(); 
 
         static void Main()
         {
-            var waitress = new Waitress("Sexy Mary", new PublishingConsumer(Topics.NewOrders));
+#warning TODO: Replace topics with message types???
+#warning TODO: Make TimeToLiveHandler work with OrderMessageBase
+
+            var waitress = new Waitress("Sexy Mary");
             var kitchen = PrepareKitchen();
             var assistantManager = PrepareAssistantManager();
-            var cashier = new Cashier(new CorrelatedPublishingConsumer());
+            var cashier = new Cashier();
             var threadedCashier = PrepareThreadedCashier(cashier);
 
             var midgetHouse = new MidgetHouse();
@@ -42,17 +46,19 @@ namespace RestaurantKata
             Console.ReadLine();
         }
 
-        private static ThreadedConsumer<IOrderConsumer> PrepareThreadedCashier(Cashier cashier)
+        private static ThreadedConsumer<OrderReadyForPayment> PrepareThreadedCashier(Cashier cashier)
         {
-            var threadedCashier = new ThreadedConsumer<IOrderConsumer>("Cashier", cashier);
-            ThreadedConsumers.Add(threadedCashier);
+            var threadedCashier = new ThreadedConsumer<OrderReadyForPayment>("Cashier", cashier);
+            MonitoredConsumers.Add(threadedCashier);
+            StartableThings.Add(threadedCashier);
             return threadedCashier;
         }
 
-        private static ThreadedConsumer<IOrderConsumer> PrepareAssistantManager()
+        private static ThreadedConsumer<OrderReadyForPricing> PrepareAssistantManager()
         {
-            var assistantManager = new ThreadedConsumer<IOrderConsumer>("AssistantManager", new AssistantManager(new CorrelatedPublishingConsumer()));
-            ThreadedConsumers.Add(assistantManager);
+            var assistantManager = new ThreadedConsumer<OrderReadyForPricing>("AssistantManager", new AssistantManager());
+            MonitoredConsumers.Add(assistantManager);
+            StartableThings.Add(assistantManager);
             return assistantManager;
         }
 
@@ -60,25 +66,27 @@ namespace RestaurantKata
         {
             StartQueueMonitoring();
 
-            foreach (var startable in ThreadedConsumers)
+            foreach (var startable in StartableThings)
             {
                 startable.Start();
             }
         }
 
-        private static ThreadedConsumer<IOrderConsumer> PrepareKitchen()
+        private static ThreadedConsumer<OrderReadyToCook> PrepareKitchen()
         {
-            var threadedCooks = new List<ThreadedConsumer<IOrderConsumer>>();
+            var threadedCooks = new List<ThreadedConsumer<OrderReadyToCook>>();
             const int numberOfCooks = 3;
             for (var i = 0; i < numberOfCooks; i++)
             {
-                var threadedCook = new ThreadedConsumer<IOrderConsumer>("Cook", new TimeToLiveHandler(new Cook(new CorrelatedPublishingConsumer())));
+                var threadedCook = new ThreadedConsumer<OrderReadyToCook>("Cook", new TimeToLiveHandler(new Cook()));
                 threadedCooks.Add(threadedCook);
-                ThreadedConsumers.Add(threadedCook);
+                MonitoredConsumers.Add(threadedCook);
+                StartableThings.Add(threadedCook);
             }
 
-            var dispatcher = new ThreadedConsumer<IOrderConsumer>("Dispatcher", new OrderDispatcher(threadedCooks), int.MaxValue);
-            ThreadedConsumers.Add(dispatcher);
+            var dispatcher = new ThreadedConsumer<OrderReadyToCook>("Dispatcher", new OrderDispatcher<OrderReadyToCook>(threadedCooks), int.MaxValue);
+            MonitoredConsumers.Add(dispatcher);
+            StartableThings.Add(dispatcher);
             return dispatcher;
         }
 
@@ -86,7 +94,7 @@ namespace RestaurantKata
         {
             var monitor = new QueueMonitor();
 
-            monitor.AddComponents(ThreadedConsumers);
+            monitor.AddComponents(MonitoredConsumers);
             monitor.Start();
         }
 
