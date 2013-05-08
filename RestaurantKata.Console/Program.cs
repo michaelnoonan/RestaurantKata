@@ -13,8 +13,8 @@ namespace RestaurantKata
 
         static void Main()
         {
-#warning TODO: Replace topics with message types???
-#warning TODO: Make TimeToLiveHandler work with OrderMessageBase
+            #warning TODO: Replace topics with message types???
+            #warning TODO: Make TimeToLiveHandler work with OrderMessageBase
 
             var waitress = new Waitress("Sexy Mary");
             var kitchen = PrepareKitchen();
@@ -23,11 +23,11 @@ namespace RestaurantKata
             var threadedCashier = PrepareThreadedCashier(cashier);
 
             var midgetHouse = new MidgetHouse();
-            TopicPubSub.Instance.Subscribe(Topics.NewOrders, midgetHouse);
+            TopicPubSub.Instance.Subscribe<OrderPlaced>(Topics.NewOrders, midgetHouse);
             TopicPubSub.Instance.Subscribe(Topics.CooksQueue, kitchen);
             TopicPubSub.Instance.Subscribe(Topics.Pricing, assistantManager);
             TopicPubSub.Instance.Subscribe(Topics.Payment, threadedCashier);
-            TopicPubSub.Instance.Subscribe(Topics.CompletedOrders, midgetHouse);
+            TopicPubSub.Instance.Subscribe<OrderCompleted>(Topics.CompletedOrders, midgetHouse);
 
             Start();
 

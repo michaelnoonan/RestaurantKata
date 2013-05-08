@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -13,12 +14,13 @@ namespace RestaurantKata.Infrastructure
 
         readonly ConcurrentDictionary<string, MultiPlexer> subscriptions = new ConcurrentDictionary<string, MultiPlexer>();
 
-        public void Subscribe(string topic, object consumer)
+
+        public void Subscribe<TMessage>(string topic, IConsume<TMessage> consumer) where TMessage : IMessage
         {
-            subscriptions.AddOrUpdate(topic, key => new MultiPlexer(consumer), 
+            subscriptions.AddOrUpdate(topic, key => new MultiPlexer(new NarrowingConsumer<TMessage>(consumer)), 
                                       (key, multiPlexer) =>
                                           {
-                                              multiPlexer.Add(consumer);
+                                              multiPlexer.Add(new NarrowingConsumer<TMessage>(consumer));
                                               return multiPlexer;
                                           }); 
         }
@@ -32,6 +34,12 @@ namespace RestaurantKata.Infrastructure
         public static TopicPubSub Instance
         {
             get; private set;
+        }
+
+        public void SubscribeAll(string correlationId, object subscriber)
+        {
+            var iConsume = subscriber.GetType().GetInterfaces().Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IConsume<>)).ToList();
+
         }
     }
 

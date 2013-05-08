@@ -11,7 +11,11 @@ namespace RestaurantKata.Infrastructure
         public bool Consume(OrderPlaced message)
         {
             var midget = house.GetOrAdd(message.Order.CorrelationId, key => new Midget(key));
-            TopicPubSub.Instance.Subscribe(message.Order.CorrelationId, midget);
+            TopicPubSub.Instance.Subscribe<FoodCooked>(message.Order.CorrelationId, midget);
+            TopicPubSub.Instance.Subscribe<OrderPriced>(message.Order.CorrelationId, midget);
+            TopicPubSub.Instance.Subscribe<OrderPaid>(message.Order.CorrelationId, midget);
+            //TODO: Make it work with reflection
+            //TopicPubSub.Instance.SubscribeAll(message.Order.CorrelationId, midget);
             midget.StartOrder(message.Order);
             return true;
         }
