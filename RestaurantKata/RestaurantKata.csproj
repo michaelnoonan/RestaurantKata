@@ -54,6 +54,13 @@
   <ItemGroup>
     <Compile Include="AssistantManager.cs" />
     <Compile Include="Cashier.cs" />
+    <Compile Include="Infrastructure\Alarm\AlarmClock.cs" />
+    <Compile Include="Infrastructure\Alarm\AlarmStorage.cs" />
+    <Compile Include="Infrastructure\Alarm\DateTimeComparer.cs" />
+    <Compile Include="Infrastructure\Alarm\IAlarmStorage.cs" />
+    <Compile Include="Infrastructure\Alarm\IDateTimeComparer.cs" />
+    <Compile Include="Infrastructure\Alarm\Tests.cs" />
+    <Compile Include="Infrastructure\Alarm\WakeUpCall.cs" />
     <Compile Include="Infrastructure\ConsoleConsumeProcessor.cs" />
     <Compile Include="Infrastructure\ExtensibleDynamicObject.cs" />
     <Compile Include="Infrastructure\IHaveAQueue.cs" />
